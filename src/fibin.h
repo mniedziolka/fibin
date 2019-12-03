@@ -1,7 +1,8 @@
-#include <type_traits>
-
 #ifndef __FIBIN_H__
 #define __FIBIN_H__
+
+#include <type_traits>
+#include <iostream>
 
 // Empty list.
 struct Nil;
@@ -41,9 +42,8 @@ template <typename Then, typename Else> class If <std::false_type, Then, Else>{
 };
 
 
-
-
-template <typename ValueType> class Fibin {
+template <typename ValueType>
+class Fibin {
 
     template <typename Expr>
     static typename std::enable_if<std::is_integral<ValueType>::value, ValueType>::type eval(){
@@ -51,9 +51,8 @@ template <typename ValueType> class Fibin {
     }
     template <typename Expr>
     static typename std::enable_if<!std::is_integral<ValueType>::value, void>::type eval(){
-
+        std::cout << "Fibin doesn't support: " << std::string(typeid(ValueType));
     }
 };
-
 
 #endif // __FIBIN_H__
