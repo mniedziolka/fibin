@@ -30,22 +30,33 @@ struct FindInList<Cons<CurrVar, CurrValue, Tail>, SearchedVar> {
     using value = typename FindInList<Tail, SearchedVar>::value;
 };
 
-
-template<unsigned long long n>
+template <int N>
 struct Fib {
-    static constexpr unsigned long long value = Fib<n-1>::value + Fib<n-2>::value;
+    static_assert(N >= 0, "N in Fib<N> should be non-negative");
 };
 
-template<>
-struct Fib<0> {
-    static constexpr int value = 0;
-};
+//template <>
+//struct Lit<True> {};
+//
+//template <>
+//struct Lit<False> {};
 
-template<>
-struct Fib<1> {
-    static constexpr int value = 1;
-};
+//template <int N>
+//struct Lit<Fib<N>> {
+//static constexpr unsigned long long value = Lit<Fib<N - 1>>::value + Lit<Fib<N - 2>>::value;
+//};
+//
+//template <>
+//struct Lit<Fib<0>> {
+//static constexpr unsigned long long value = 0;
+//};
+//
+//template <>
+//struct Lit<Fib<1>> {
+//static constexpr unsigned long long value = 1;
+//};
 
+// Tu trzeba zmienic wszystko az do Evala musi byc puste (ew. assertowac) a Eval przepycha srodowisko.
 
 template <typename Condition, typename Then, typename Else> class If;
 //true branch
@@ -72,7 +83,7 @@ template <typename ValueType>
 class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
 public:
     template <typename Expr>
-    static int eval(){
+    static ValueType eval(){
         return 1;
     }
 };
