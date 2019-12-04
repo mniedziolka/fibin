@@ -30,6 +30,23 @@ struct FindInList<Cons<CurrVar, CurrValue, Tail>, SearchedVar> {
     using value = typename FindInList<Tail, SearchedVar>::value;
 };
 
+
+template<unsigned long long n>
+struct Fib {
+    static constexpr unsigned long long value = Fib<n-1>::value + Fib<n-2>::value;
+};
+
+template<>
+struct Fib<0> {
+    static constexpr int value = 0;
+};
+
+template<>
+struct Fib<1> {
+    static constexpr int value = 1;
+};
+
+
 template <typename Condition, typename Then, typename Else> class If;
 //true branch
 template <typename Then, typename Else> class If <std::true_type, Then, Else>{
@@ -41,17 +58,22 @@ template <typename Then, typename Else> class If <std::false_type, Then, Else>{
     typedef int result;
 };
 
+// We use "substitution failure is not an error".
+template <typename ValueType, typename = void>
+class Fibin {
+public:
+    template <typename Expr>
+    static void eval(){
+        std::cout << "Fibin doesn't support: " << std::string(typeid(ValueType)) << "\n";;
+    }
+};
 
 template <typename ValueType>
-class Fibin {
-
+class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
+public:
     template <typename Expr>
-    static typename std::enable_if<std::is_integral<ValueType>::value, ValueType>::type eval(){
-
-    }
-    template <typename Expr>
-    static typename std::enable_if<!std::is_integral<ValueType>::value, void>::type eval(){
-        std::cout << "Fibin doesn't support: " << std::string(typeid(ValueType));
+    static int eval(){
+        return 1;
     }
 };
 
