@@ -16,7 +16,6 @@ struct Ref {};
 template <typename Condition, typename Then, typename Else>
 struct If {};
 
-
 // Empty list.
 struct Nil;
 
@@ -48,57 +47,81 @@ struct Fib {
     static_assert(N >= 0, "N in Fib<N> should be non-negative");
 };
 
-//template <>
-//struct Lit<True> {};
-//
-//template <>
-//struct Lit<False> {};
-
-//template <int N>
-//struct Lit<Fib<N>> {
-//static constexpr unsigned long long value = Lit<Fib<N - 1>>::value + Lit<Fib<N - 2>>::value;
-//};
-//
-//template <>
-//struct Lit<Fib<0>> {
-//static constexpr unsigned long long value = 0;
-//};
-//
-//template <>
-//struct Lit<Fib<1>> {
-//static constexpr unsigned long long value = 1;
-//};
-
 // We use "substitution failure is not an error".
 template <typename ValueType, typename = void>
 class Fibin {
 public:
     template <typename Expr>
     static void eval(){
-        std::cout << "Fibin doesn't support: " << std::string(typeid(ValueType)) << "\n";;
+        std::cout << "Fibin doesn't support: " << typeid(ValueType).name() << "\n";;
     }
 };
 
 template <typename ValueType>
 class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
 private:
+    // We will store in the environmnent type for every integer.
+    template <ValueType N>
+    struct IntValue {};
+
     template <typename Exp, typename Env>
     struct Eval {};
 
+    // Apply value of the arguments to function.
     template <typename Proc, typename Value>
     struct Apply {};
 
     template <typename Env>
-    struct Eval <Lit<ValueType>, Env> {
-        ValueType typedef result;
+    struct Eval <Lit<True>, Env> {
+        using value = True;
+    };
+
+    template <typename Env>
+    struct Eval <Lit<False>, Env> {
+        using value = False;
+    };
+
+    template <int N, typename Env>
+    struct Eval <Lit<Fib<N>>, Env> {
+        static constexpr IntValue value = Eval<Lit<Fib<N - 1>>, Env>::value
+                                          + Eval<Lit<Fib<N - 2>>, Env>::value;
+    };
+
+    template <typename Env>
+    struct Eval <Lit<Fib<0>>, Env> {
+        static constexpr IntValue value = 0;
+    };
+
+    template <typename Env>
+    struct Eval <Lit<Fib<1>>, Env> {
+        static constexpr IntValue value = 1;
     };
 
     // Get Var value from Env.
     template <unsigned Var, typename Env>
     struct Eval <Ref<Var>, Env> {
-        typename FindInList<Env, Var>::value typedef result;
+        using result =  typename FindInList<Env, Var>::value;
     };
 
+    // If True.
+    template <typename Then, typename Else, typename Env>
+    struct Eval<If<True, Then, Else>, Env> {
+        using result = typename Eval<Then, Env>::result;
+    };
+
+    // If False.
+    template <typename Then, typename Else, typename Env>
+    struct Eval<If<False, Then, Else>, Env> {
+        using result = typename Eval<Else, Env>::result;
+    };
+
+    // Evaluate the condition.
+    template <typename Condition, typename Then, typename Else, typename Env>
+    struct Eval <If<Condition, Then, Else>, Env> {
+        using result = typename Eval<If<
+                typename Eval<Condition, Env>::result, Then, Else>,
+                Env>::result;
+    };
 
 
 public:
