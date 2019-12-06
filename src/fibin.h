@@ -66,7 +66,9 @@ class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::val
 private:
     // We will store in the environmnent type for every integer.
     template <ValueType N>
-    struct IntValue {};
+    struct IntValue {
+        static constexpr ValueType value = N;
+    };
 
     template <typename Exp, typename Env>
     struct Eval {};
@@ -87,18 +89,17 @@ private:
 
     template <int N, typename Env>
     struct Eval <Lit<Fib<N>>, Env> {
-        static constexpr IntValue value = Eval<Lit<Fib<N - 1>>, Env>::value
-                                          + Eval<Lit<Fib<N - 2>>, Env>::value;
+        using value = IntValue<Eval<Lit<Fib<N-1>>, Env>::value::value + Eval<Lit<Fib<N-2>>, Env>::value::value>;
     };
 
     template <typename Env>
     struct Eval <Lit<Fib<0>>, Env> {
-        static constexpr IntValue value = 0;
+        using value = IntValue<0>;
     };
 
     template <typename Env>
     struct Eval <Lit<Fib<1>>, Env> {
-        static constexpr IntValue value = 1;
+        using value = IntValue<1>;
     };
 
     // Get Var value from Env.
