@@ -10,8 +10,11 @@ struct False;
 template <typename T>
 struct Lit {};
 
-template <unsigned T>
+template <uint64_t T>
 struct Ref {};
+
+template <uint64_t Var, typename Value, typename Expr>
+struct Let {};
 
 template <typename Condition, typename Then, typename Else>
 struct If {};
@@ -105,7 +108,14 @@ private:
     // Get Var value from Env.
     template <unsigned Var, typename Env>
     struct Eval <Ref<Var>, Env> {
-        using result =  typename FindInList<Env, Var>::value;
+        using result = typename FindInList<Env, Var>::value;
+    };
+
+    // Define new variable and evaluate expression with new environment.
+    template <uint64_t Var, typename Value, typename Expr, typename Env>
+    struct Eval <Let<Var, Value, Expr>, Env> {
+        using value = Eval<Expr, Cons<Var, typename Eval<Value, Env>::value, Env>>;
+
     };
 
     // If True.
