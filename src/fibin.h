@@ -121,29 +121,27 @@ private:
     // If True.
     template <typename Then, typename Else, typename Env>
     struct Eval<If<True, Then, Else>, Env> {
-        using result = typename Eval<Then, Env>::result;
+        using value = typename Eval<Then, Env>::value;
     };
 
     // If False.
     template <typename Then, typename Else, typename Env>
     struct Eval<If<False, Then, Else>, Env> {
-        using result = typename Eval<Else, Env>::result;
+        using value = typename Eval<Else, Env>::value;
     };
 
     // Evaluate the condition.
     template <typename Condition, typename Then, typename Else, typename Env>
     struct Eval <If<Condition, Then, Else>, Env> {
-        using result = typename Eval<If<
-                typename Eval<Condition, Env>::result, Then, Else>,
-                Env>::result;
+        using value = typename Eval<If<
+                typename Eval<Condition, Env>::value, Then, Else>,
+                Env>::value;
     };
-
-
 
 public:
     template <typename Expr>
-    static ValueType eval(){
-        return 1;
+    constexpr static ValueType eval(){
+        return Eval<Expr, Nil>::value::value;
     }
 };
 
