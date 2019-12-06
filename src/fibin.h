@@ -20,24 +20,24 @@ struct If {};
 struct Nil;
 
 // Head <Var, Value> + Tail.
-template <unsigned Var, typename Value, typename Tail>
+template <uint64_t Var, typename Value, typename Tail>
 struct Cons;
 
-template <typename List, unsigned Var>
+template <typename List, uint64_t Var>
 struct FindInList {};
 
 // Find in empty list.
-template <unsigned Var>
+template <uint64_t Var>
 struct FindInList<Nil, Var> {};
 
 // Searched element is in the current head.
-template <unsigned CurrVar, typename CurrValue, typename Tail>
+template <uint64_t CurrVar, typename CurrValue, typename Tail>
 struct FindInList <Cons<CurrVar, CurrValue, Tail>, CurrVar> {
     using value = CurrValue;
 };
 
 // Searched element is not in the current head but can be in tail.
-template <unsigned CurrVar, typename CurrValue, typename Tail, unsigned SearchedVar>
+template <uint64_t CurrVar, typename CurrValue, typename Tail, uint64_t SearchedVar>
 struct FindInList <Cons<CurrVar, CurrValue, Tail>, SearchedVar> {
     using value = typename FindInList<Tail, SearchedVar>::value;
 };
@@ -46,6 +46,10 @@ template <int N>
 struct Fib {
     static_assert(N >= 0, "N in Fib<N> should be non-negative");
 };
+
+static constexpr uint64_t Var(const char* x) {
+    return 1;
+}
 
 // We use "substitution failure is not an error".
 template <typename ValueType, typename = void>
@@ -122,6 +126,7 @@ private:
                 typename Eval<Condition, Env>::result, Then, Else>,
                 Env>::result;
     };
+
 
 
 public:
