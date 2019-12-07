@@ -16,6 +16,9 @@ struct Ref {};
 template <uint64_t Var, typename Value, typename Expr>
 struct Let {};
 
+template <typename Left, typename Right, typename Env>
+struct Eq {};
+
 template <typename Condition, typename Then, typename Else>
 struct If {};
 
@@ -116,6 +119,26 @@ private:
     struct Eval <Let<Var, Value, Expr>, Env> {
         using value = Eval<Expr, Cons<Var, typename Eval<Value, Env>::value, Env>>;
 
+    };
+
+    template <typename Left, typename Right, typename Env>
+    struct EqHelper {};
+
+    // Evaluated values are different.
+    template <typename Env>
+    struct EqHelper <ValueType, ValueType, Env> {
+        using value = False;
+    };
+
+    // Evaluated values are the same.
+    template <ValueType N, typename Env>
+    struct EqHelper <IntValue<N>, IntValue<N>, Env> {
+        using value = True;
+    };
+
+    template <typename Left, typename Right, typename Env>
+    struct Eq {
+        using value = typename EqHelper<Eval<Left, Env>, Eval<Right, Env>, Env>::value;
     };
 
     // If True.
