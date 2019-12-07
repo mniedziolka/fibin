@@ -16,8 +16,14 @@ struct Ref {};
 template <uint64_t Var, typename Value, typename Expr>
 struct Let {};
 
-template <typename Left, typename Right, typename Env>
+template <typename Left, typename Right>
 struct Eq {};
+
+template <typename T>
+struct Inc1{};
+
+template <typename T>
+struct Inc10{};
 
 template <typename Condition, typename Then, typename Else>
 struct If {};
@@ -57,7 +63,7 @@ static constexpr uint64_t Var(const char* x) {
     return 1;
 }
 
-// We use "substitution failure is not an error".
+// Substitution failure is not an error
 template <typename ValueType, typename = void>
 class Fibin {
 public:
@@ -70,7 +76,7 @@ public:
 template <typename ValueType>
 class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
 private:
-    // We will store in the environmnent type for every integer.
+    // We will store in the environment type for every integer.
     template <ValueType N>
     struct IntValue {
         static constexpr ValueType value = N;
@@ -121,35 +127,35 @@ private:
 
     };
 
-    template <typename Left, typename Right, typename Env>
+    template <typename Left, typename Right>
     struct EqHelper {};
 
     // Evaluated values are different.
-    template <typename Env>
-    struct EqHelper <ValueType, ValueType, Env> {
+    template <>
+    struct EqHelper <ValueType, ValueType> {
         using value = False;
     };
 
     // Evaluated values are the same.
-    template <ValueType N, typename Env>
-    struct EqHelper <IntValue<N>, IntValue<N>, Env> {
+    template <ValueType N>
+    struct EqHelper <IntValue<N>, IntValue<N>> {
         using value = True;
     };
 
     template <typename Left, typename Right, typename Env>
-    struct Eq {
-        using value = typename EqHelper<Eval<Left, Env>, Eval<Right, Env>, Env>::value;
+    struct Eval <Eq<Left, Right>, Env> {
+        using value = typename EqHelper<Eval<Left, Env>, Eval<Right, Env>>::value;
     };
 
     // If True.
     template <typename Then, typename Else, typename Env>
-    struct Eval<If<True, Then, Else>, Env> {
+    struct Eval <If<True, Then, Else>, Env> {
         using value = typename Eval<Then, Env>::value;
     };
 
     // If False.
     template <typename Then, typename Else, typename Env>
-    struct Eval<If<False, Then, Else>, Env> {
+    struct Eval <If<False, Then, Else>, Env> {
         using value = typename Eval<Else, Env>::value;
     };
 
@@ -160,6 +166,26 @@ private:
                 typename Eval<Condition, Env>::value, Then, Else>,
                 Env>::value;
     };
+
+    template <typename Arg, unsigned Value>
+    struct IncHelper {};
+
+    template <ValueType N, unsigned Value>
+    struct IncHelper <IntValue<N>, Value> {
+        using value = IntValue<IntValue<N>::value + Eval<Lit<Fib<Value>>, Nil>::value>;
+    };
+
+    template <typename Arg, typename Env>
+    struct Eval <Inc1<Arg>, Env> {
+        using value = typename IncHelper<typename Eval<Arg, Env>::value, 1>::value;
+    };
+
+    template <typename Arg, typename Env>
+    struct Eval <Inc10<Arg>, Env> {
+        using value = typename IncHelper<typename Eval<Arg, Env>::value, 10>::value;
+    };
+
+
 
 public:
     template <typename Expr>
