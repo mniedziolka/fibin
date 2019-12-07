@@ -117,7 +117,7 @@ private:
     // Get Var value from Env.
     template <unsigned Var, typename Env>
     struct Eval <Ref<Var>, Env> {
-        using result = typename FindInList<Env, Var>::value;
+        using value = typename FindInList<Env, Var>::value;
     };
 
     // Define new variable and evaluate expression with new environment.
@@ -131,8 +131,8 @@ private:
     struct EqHelper {};
 
     // Evaluated values are different.
-    template <>
-    struct EqHelper <ValueType, ValueType> {
+    template <ValueType A, ValueType B>
+    struct EqHelper <IntValue<A>, IntValue<B>> {
         using value = False;
     };
 
@@ -172,17 +172,17 @@ private:
 
     template <ValueType N, unsigned Value>
     struct IncHelper <IntValue<N>, Value> {
-        using value = IntValue<IntValue<N>::value + Eval<Lit<Fib<Value>>, Nil>::value>;
+        using value = IntValue<N + Eval<Lit<Fib<Value>>, Nil>::value>;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc1<Arg>, Env> {
-        using value = typename IncHelper<typename Eval<Arg, Env>::value, 1>::value;
+        using value = typename IncHelper<Eval<Arg, Env>, 1>::value;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc10<Arg>, Env> {
-        using value = typename IncHelper<typename Eval<Arg, Env>::value, 10>::value;
+        using value = typename IncHelper<Eval<Arg, Env>, 10>::value;
     };
 
 
