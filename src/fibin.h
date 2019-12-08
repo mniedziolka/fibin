@@ -2,6 +2,7 @@
 #define __FIBIN_H__
 
 #include <type_traits>
+#include <cassert>
 #include <iostream>
 
 struct True;
@@ -20,10 +21,13 @@ template <typename Left, typename Right>
 struct Eq {};
 
 template <typename T>
-struct Inc1{};
+struct Inc1 {};
 
 template <typename T>
-struct Inc10{};
+struct Inc10 {};
+
+template <typename ... Args>
+struct Sum {};
 
 template <typename Condition, typename Then, typename Else>
 struct If {};
@@ -76,7 +80,7 @@ public:
 template <typename ValueType>
 class Fibin <ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
 private:
-    // We will store in the environment type for every integer.
+    // We will store type for every integer in the environment .
     template <ValueType N>
     struct IntValue {
         static constexpr ValueType value = N;
@@ -123,7 +127,7 @@ private:
     // Define new variable and evaluate expression with new environment.
     template <uint64_t Var, typename Value, typename Expr, typename Env>
     struct Eval <Let<Var, Value, Expr>, Env> {
-        using value = Eval<Expr, Cons<Var, typename Eval<Value, Env>::value, Env>>;
+        using value = typename Eval<Expr, Cons<Var, typename Eval<Value, Env>::value, Env>>::value;
 
     };
 
@@ -133,13 +137,13 @@ private:
     // Evaluated values are different.
     template <ValueType A, ValueType B>
     struct EqHelper <IntValue<A>, IntValue<B>> {
-        using value = False;
+        using value = typename Eval<Lit<False>, Nil>::value;
     };
 
     // Evaluated values are the same.
     template <ValueType N>
     struct EqHelper <IntValue<N>, IntValue<N>> {
-        using value = True;
+        using value = typename Eval<Lit<True>, Nil>::value;
     };
 
     template <typename Left, typename Right, typename Env>
@@ -167,22 +171,47 @@ private:
                 Env>::value;
     };
 
-    template <typename Arg, unsigned Value>
+    template <typename Arg, ValueType Value>
     struct IncHelper {};
 
-    template <ValueType N, unsigned Value>
+    template <ValueType N, ValueType Value>
     struct IncHelper <IntValue<N>, Value> {
-        using value = IntValue<N + Eval<Lit<Fib<Value>>, Nil>::value>;
+        using value = IntValue<N + Eval<Lit<Fib<Value>>, Nil>::value::value>;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc1<Arg>, Env> {
-        using value = typename IncHelper<Eval<Arg, Env>, 1>::value;
+        using value = typename IncHelper<typename Eval<Arg, Env>::value, 1>::value;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc10<Arg>, Env> {
         using value = typename IncHelper<Eval<Arg, Env>, 10>::value;
+    };
+
+    //TODO: Refactor SumOfIntegers using Increment
+    template <typename Env, typename ... Args>
+    struct SumOfIntegers {};
+
+    template <ValueType A, ValueType B>
+    struct SumOfIntegers <IntValue<A>, IntValue<B>> {
+        using value = IntValue<A + B>;
+    };
+
+    template <typename Arg1, typename Arg2, typename ... Args, typename Env>
+    struct Eval <Sum<Arg1, Arg2, Args...>, Env> {
+        using value = typename SumOfIntegers<
+                typename Eval<Arg1, Env>::value,
+                typename Eval<Sum<Arg2, Args...>, Env>::value
+            >::value;
+    };
+
+    template <typename Arg1, typename Arg2, typename Env>
+    struct Eval <Sum<Arg1, Arg2>, Env> {
+        using value = typename SumOfIntegers<
+                typename Eval<Arg1, Env>::value,
+                typename Eval<Arg2, Env>::value
+        >::value;
     };
 
 
