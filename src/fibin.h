@@ -70,8 +70,6 @@ struct Fib {
 };
 
 static constexpr uint64_t Var(const char* x) {
-    // 0-9 + A-Z + a/z
-    //assert length 1-6, a-z A-Z 0-9
     uint64_t result = 0;
     char current = *x;
     int length = 0;
