@@ -171,36 +171,33 @@ private:
                 Env>::value;
     };
 
-    template <typename Arg, ValueType Value>
+    template <typename A, typename B>
     struct IncHelper {};
 
-    template <ValueType N, ValueType Value>
-    struct IncHelper <IntValue<N>, Value> {
-        using value = IntValue<N + Eval<Lit<Fib<Value>>, Nil>::value::value>;
+    template <ValueType A, ValueType B>
+    struct IncHelper <IntValue<A>, IntValue<B>> {
+        using value = IntValue<A + B>;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc1<Arg>, Env> {
-        using value = typename IncHelper<typename Eval<Arg, Env>::value, 1>::value;
+        using value = typename IncHelper<
+                typename Eval<Arg, Env>::value,
+                typename Eval<Lit<Fib<1>>, Nil>::value
+            >::value;
     };
 
     template <typename Arg, typename Env>
     struct Eval <Inc10<Arg>, Env> {
-        using value = typename IncHelper<Eval<Arg, Env>, 10>::value;
-    };
-
-    //TODO: Refactor SumOfIntegers using Increment
-    template <typename Env, typename ... Args>
-    struct SumOfIntegers {};
-
-    template <ValueType A, ValueType B>
-    struct SumOfIntegers <IntValue<A>, IntValue<B>> {
-        using value = IntValue<A + B>;
+        using value = typename IncHelper<
+                typename Eval<Arg, Env>::value,
+                typename Eval<Lit<Fib<10>>, Nil>::value
+        >::value;
     };
 
     template <typename Arg1, typename Arg2, typename ... Args, typename Env>
     struct Eval <Sum<Arg1, Arg2, Args...>, Env> {
-        using value = typename SumOfIntegers<
+        using value = typename IncHelper<
                 typename Eval<Arg1, Env>::value,
                 typename Eval<Sum<Arg2, Args...>, Env>::value
             >::value;
@@ -208,13 +205,11 @@ private:
 
     template <typename Arg1, typename Arg2, typename Env>
     struct Eval <Sum<Arg1, Arg2>, Env> {
-        using value = typename SumOfIntegers<
+        using value = typename IncHelper<
                 typename Eval<Arg1, Env>::value,
                 typename Eval<Arg2, Env>::value
         >::value;
     };
-
-
 
 public:
     template <typename Expr>
