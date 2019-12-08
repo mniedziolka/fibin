@@ -29,6 +29,12 @@ struct Inc10 {};
 template <typename ... Args>
 struct Sum {};
 
+template <uint64_t Var, typename Body>
+struct Lambda {};
+
+template <typename Fun, typename Param>
+struct Invoke {};
+
 template <typename Condition, typename Then, typename Else>
 struct If {};
 
@@ -85,6 +91,10 @@ private:
     struct IntValue {
         static constexpr ValueType value = N;
     };
+
+    // Container for lambda to store current environment.
+    template <typename Lambda, typename Env>
+    struct LambdaHelper {};
 
     template <typename Exp, typename Env>
     struct Eval {};
@@ -209,6 +219,23 @@ private:
                 typename Eval<Arg1, Env>::value,
                 typename Eval<Arg2, Env>::value
         >::value;
+    };
+
+    template <uint64_t Var, typename Body, typename Env>
+    struct Eval <Lambda<Var, Body>, Env> {
+        using value = LambdaHelper<Lambda<Var, Body>, Env>;
+    };
+
+    template <uint64_t Var, typename Body, typename Param, typename Env>
+    struct Eval <Invoke<Lambda<Var, Body>, Param>, Env> {
+        using value = typename Eval<
+                Body,
+                Cons<
+                        Var,
+                        typename Eval<Param, Env>::value,
+                        Env
+                 >
+            >::value;
     };
 
 public:
