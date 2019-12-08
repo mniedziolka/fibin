@@ -226,14 +226,28 @@ private:
         using value = LambdaHelper<Lambda<Var, Body>, Env>;
     };
 
-    template <uint64_t Var, typename Body, typename Param, typename Env>
-    struct Eval <Invoke<Lambda<Var, Body>, Param>, Env> {
+    template <typename Fun, typename Param, typename Env>
+    struct Eval <Invoke<Fun, Param>, Env> {
+        using value = typename Eval<Invoke<Eval<Fun, Env>, Param>, Env>::value;
+    };
+
+    template <uint64_t Var, typename Body, typename Param, typename LambdaEnv, typename Env>
+    struct Eval <
+            Invoke<
+                LambdaHelper<
+                    Lambda<Var, Body>,
+                    LambdaEnv
+                >,
+                Param
+            >,
+            Env>
+    {
         using value = typename Eval<
                 Body,
                 Cons<
-                        Var,
-                        typename Eval<Param, Env>::value,
-                        Env
+                    Var,
+                    typename Eval<Param, Env>::value,
+                    LambdaEnv
                  >
             >::value;
     };
