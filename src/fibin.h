@@ -70,6 +70,30 @@ struct Fib {
 };
 
 static constexpr uint64_t Var(const char* x) {
+/*    // 0-9 + A-Z + a/z
+    //assert length 1-6, a-z A-Z 0-9
+    uint64_t result = 0;
+    char current = *x;
+    int length = 0;
+    while(current != '\0' and length < 7) {
+        length++;
+        result = result <<8u;
+        if (current >= 'a' && current <= 'z') {
+            result += 10 + current - 'a';
+        } else if (current >= 'A' && current <= 'Z') {
+            result += 10 + current - 'A';
+        } else if (current >= '0' && current <= '9') {
+            result  += current - '0';
+        } else {
+            assert(false);
+        }
+        x++;
+        current = *x;
+    }
+    if(!(length>=1 && length <=6)){
+        assert(false);
+    }
+    return result;*/
     return 1;
 }
 
@@ -79,7 +103,7 @@ class Fibin {
 public:
     template <typename Expr>
     static void eval(){
-        std::cout << "Fibin doesn't support: " << typeid(ValueType).name() << "\n";;
+        std::cout << "Fibin doesn't support: " << typeid(ValueType).name() << "\n";
     }
 };
 
