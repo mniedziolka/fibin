@@ -142,7 +142,7 @@ private:
 
     template <int N, typename Env>
     struct Eval <Lit<Fib<N>>, Env> {
-        using value = IncHelper<
+        using value = typename IncHelper<
                 typename Eval<Lit<Fib<N-1>>, Env>::value,
                 typename Eval<Lit<Fib<N-2>>, Env>::value
                 >::value;
@@ -188,7 +188,10 @@ private:
 
     template <typename Left, typename Right, typename Env>
     struct Eval <Eq<Left, Right>, Env> {
-        using value = typename EqHelper<Eval<Left, Env>::value, Eval<Right, Env>::value>::value;
+        using value = typename EqHelper<
+                typename Eval<Left, Env>::value,
+                typename Eval<Right, Env>::value
+            >::value;
     };
 
     // If True.
@@ -224,7 +227,7 @@ private:
         using value = typename IncHelper<
                 typename Eval<Arg, Env>::value,
                 typename Eval<Lit<Fib<10>>, Nil>::value
-        >::value;
+            >::value;
     };
 
     template <typename Arg1, typename Arg2, typename ... Args, typename Env>
