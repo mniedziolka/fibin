@@ -70,12 +70,12 @@ struct Fib {
 };
 
 static constexpr uint64_t Var(const char* x) {
-/*    // 0-9 + A-Z + a/z
+    // 0-9 + A-Z + a/z
     //assert length 1-6, a-z A-Z 0-9
     uint64_t result = 0;
     char current = *x;
     int length = 0;
-    while(current != '\0' and length < 7) {
+    while (current != '\0' and length < 7) {
         length++;
         result = result <<8u;
         if (current >= 'a' && current <= 'z') {
@@ -85,16 +85,15 @@ static constexpr uint64_t Var(const char* x) {
         } else if (current >= '0' && current <= '9') {
             result  += current - '0';
         } else {
-            assert(false);
+            throw std::invalid_argument("Invalid Var argument");
         }
         x++;
         current = *x;
     }
-    if(!(length>=1 && length <=6)){
-        assert(false);
+    if (!(length>=1 && length <=6)) {
+        throw std::invalid_argument("Invalid Var argument length");
     }
-    return result;*/
-    return 1;
+    return result;
 }
 
 // Substitution failure is not an error
