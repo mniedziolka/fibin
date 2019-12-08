@@ -115,16 +115,20 @@ private:
         static constexpr ValueType value = N;
     };
 
+    template <typename A, typename B>
+    struct IncHelper {};
+
+    template <ValueType A, ValueType B>
+    struct IncHelper <IntValue<A>, IntValue<B>> {
+        using value = IntValue<static_cast<ValueType>(A + B)>;
+    };
+
     // Container for lambda to store current environment.
     template <typename Lambda, typename Env>
     struct LambdaHelper {};
 
     template <typename Exp, typename Env>
     struct Eval {};
-
-    // Apply value of the arguments to function.
-    template <typename Proc, typename Value>
-    struct Apply {};
 
     template <typename Env>
     struct Eval <Lit<True>, Env> {
@@ -138,7 +142,10 @@ private:
 
     template <int N, typename Env>
     struct Eval <Lit<Fib<N>>, Env> {
-        using value = IntValue<Eval<Lit<Fib<N-1>>, Env>::value::value + Eval<Lit<Fib<N-2>>, Env>::value::value>;
+        using value = IncHelper<
+                typename Eval<Lit<Fib<N-1>>, Env>::value,
+                typename Eval<Lit<Fib<N-2>>, Env>::value
+                >::value;
     };
 
     template <typename Env>
@@ -152,7 +159,7 @@ private:
     };
 
     // Get Var value from Env.
-    template <unsigned Var, typename Env>
+    template <uint64_t Var, typename Env>
     struct Eval <Ref<Var>, Env> {
         using value = typename FindInList<Env, Var>::value;
     };
@@ -181,7 +188,7 @@ private:
 
     template <typename Left, typename Right, typename Env>
     struct Eval <Eq<Left, Right>, Env> {
-        using value = typename EqHelper<Eval<Left, Env>, Eval<Right, Env>>::value;
+        using value = typename EqHelper<Eval<Left, Env>::value, Eval<Right, Env>::value>::value;
     };
 
     // If True.
@@ -202,14 +209,6 @@ private:
         using value = typename Eval<If<
                 typename Eval<Condition, Env>::value, Then, Else>,
                 Env>::value;
-    };
-
-    template <typename A, typename B>
-    struct IncHelper {};
-
-    template <ValueType A, ValueType B>
-    struct IncHelper <IntValue<A>, IntValue<B>> {
-        using value = IntValue<A + B>;
     };
 
     template <typename Arg, typename Env>
