@@ -253,7 +253,7 @@ private:
 
     template <typename Fun, typename Param, typename Env>
     struct Eval <Invoke<Fun, Param>, Env> {
-        using value = typename Eval<Invoke<Eval<Fun, Env>, Param>, Env>::value;
+        using value = typename Eval<Invoke<typename Eval<Fun, Env>::value, Param>, Env>::value;
     };
 
     template <uint64_t Var, typename Body, typename Param, typename LambdaEnv, typename Env>
