@@ -75,7 +75,7 @@ static constexpr uint64_t Var(const char* x) {
     int length = 0;
     while (current != '\0' and length < 7) {
         length++;
-        result = result <<8u;
+        result = result << 8u;
         if (current >= 'a' && current <= 'z') {
             result += 10 + current - 'a';
         } else if (current >= 'A' && current <= 'Z') {
