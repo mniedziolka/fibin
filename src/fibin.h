@@ -74,7 +74,7 @@ static constexpr uint64_t Var(const char* x) {
     char current = *x;
     int length = 0;
     while (current != '\0' and length < 7) {
-        length++;
+        ++length;
         result = result << 8u;
         if (current >= 'a' && current <= 'z') {
             result += 10 + current - 'a';
@@ -85,10 +85,10 @@ static constexpr uint64_t Var(const char* x) {
         } else {
             throw std::invalid_argument("Invalid Var argument");
         }
-        x++;
+        ++x;
         current = *x;
     }
-    if (!(length>=1 && length <=6)) {
+    if (!(length >= 1 && length <= 6)) {
         throw std::invalid_argument("Invalid Var argument length");
     }
     return result;
