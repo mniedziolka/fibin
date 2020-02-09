@@ -13,9 +13,9 @@ Example: Var("A"), Var("01234"), Var("Cdefg")
 ```
 
 * Arithmetic operation Sum, Inc1, Inc10.
-- Sum<...> - sum many arguments (at least two).
-- Inc1<Arg> - increment Arg by Fib<1>.
-- Inc10<Arg> - increment Arg by Fib<10>.
+	- Sum<...> - sum many arguments (at least two).
+	- Inc1<Arg> - increment Arg by Fib<1>.
+	- Inc10<Arg> - increment Arg by Fib<10>.
 ```
 Example: Sum<Lit<Fib<0>>, Lit<Fib<1>>, Lit<Fib<3>>>, Inc1<Lit<Fib<0>>>
 ```
