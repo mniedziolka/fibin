@@ -31,7 +31,7 @@ Example: Eq<Lit<Fib<0>>, Lit<Fib<1>>>
 Example: Ref<Var("A")>
 ```
 
-* Let<Var, Value, Expression> - assign Value to Var and calculate Expression.
+* Let<Var, Value, Expression> - assigns Value to Var and calculate Expression.
 ```
 Example: Let<Var("A"), Lit<Fib<1>>, Ref<Var("A")>>
 ```
@@ -47,7 +47,7 @@ Example: If<Lit<True>, Lit<Fib<1>>, Lit<Fib<0>>>
 Example: Lambda<Var("x"), Ref<Var("x")>>
 ```
 
-* Invoke<Function, Param> - calculate Function value for the given Param.
+* Invoke<Function, Param> - calculates Function value for the given Param.
 ```
 Example: Invoke<Lambda<Var("x"), Ref<Var("x")>>, Lit<Fib<0>>>
 ```
